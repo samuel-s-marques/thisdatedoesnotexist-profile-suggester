@@ -18,36 +18,34 @@ political_views_weights = {
 }
 
 
-def find_similar_profiles(user_data, profiles):
-    similar_profiles = []
-
-    user_description = (
-        " ".join([hobby["name"] for hobby in user_data["hobbies"]])
-        + f" {user_data['political_view']} {user_data['religion']} {user_data['relationship_goal']['name']}"
+def preprocess_description(data):
+    return (
+        " ".join([hobby["name"] for hobby in data["hobbies"]])
+        + f" {data['political_view']} {data['religion']} {data['relationship_goal']['name']}"
     )
-    profile_descriptions = [
-        " ".join([hobby["name"] for hobby in profile["hobbies"]])
-        + f" {profile['political_view']} {profile['religion']} {profile['relationship_goal']['name']}"
-        for profile in profiles
-    ]
 
-    combined_descriptions = [user_description] + profile_descriptions
 
+def initialize_vectorizer(descriptions):
     global vectorizer, cosine_similarities
     vectorizer = TfidfVectorizer()
-    profile_matrix = vectorizer.fit_transform(combined_descriptions)
+    profile_matrix = vectorizer.fit_transform(descriptions)
     cosine_similarities = linear_kernel(profile_matrix, profile_matrix)
 
+
+def calculate_similarity_scores(user_data):
     user_similarity_scores = list(enumerate(cosine_similarities[0]))
 
+    political_view = user_data["political_view"].lower()
+    weight = political_views_weights.get(political_view, 1)
+
     for i, score in user_similarity_scores:
-        political_view = user_data["political_view"].lower()
-        weight = political_views_weights.get(political_view, 1)
         user_similarity_scores[i] = (i, score * weight)
 
-    sorted_profiles = sorted(user_similarity_scores, key=lambda x: x[1], reverse=True)
+    return sorted(user_similarity_scores, key=lambda x: x[1], reverse=True)
 
-    similar_profiles = [
+
+def build_profile_data(profiles, sorted_profiles):
+    return [
         {
             "id": profiles[i - 1]["id"],
             "profile": profiles[i - 1],
@@ -56,6 +54,20 @@ def find_similar_profiles(user_data, profiles):
         for i, score in sorted_profiles
         if i != 0
     ]
+
+
+def find_similar_profiles(user_data, profiles):
+    user_description = preprocess_description(user_data)
+    profile_descriptions = [preprocess_description(profile) for profile in profiles]
+
+    combined_descriptions = [user_description] + profile_descriptions
+
+    initialize_vectorizer(combined_descriptions)
+    user_similarity_scores = calculate_similarity_scores(user_data)
+
+    sorted_profiles = sorted(user_similarity_scores, key=lambda x: x[1], reverse=True)
+
+    similar_profiles = build_profile_data(profiles, sorted_profiles)
 
     return similar_profiles
 
@@ -76,4 +88,6 @@ def find_similar_profiles_route():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    from waitress import serve
+
+    serve(app, host="0.0.0.0", port=5002)

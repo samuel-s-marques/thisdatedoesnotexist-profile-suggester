@@ -33,6 +33,9 @@ def initialize_vectorizer(descriptions):
 
 
 def calculate_similarity_scores(user_data):
+    if cosine_similarities is None:
+        return []
+
     user_similarity_scores = list(enumerate(cosine_similarities[0]))
 
     political_view = user_data["political_view"].lower()
@@ -89,5 +92,6 @@ def find_similar_profiles_route():
 
 if __name__ == "__main__":
     from waitress import serve
+
     print(f"Server started at http://localhost:5002")
     serve(app, host="0.0.0.0", port=5002)

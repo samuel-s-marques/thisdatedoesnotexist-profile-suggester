@@ -84,10 +84,14 @@ def find_similar_profiles_route():
 
         similar_profiles = find_similar_profiles(user_data, profiles_data)
 
-        return jsonify({"suggested_profiles": similar_profiles})
+        return (
+            jsonify({"suggested_profiles": similar_profiles}),
+            200,
+            {"ContentType": "application/json"},
+        )
     except Exception as e:
         print(e)
-        return jsonify({"error": str(e)})
+        return jsonify({"error": str(e)}), 500, {"ContentType": "application/json"}
 
 
 if __name__ == "__main__":

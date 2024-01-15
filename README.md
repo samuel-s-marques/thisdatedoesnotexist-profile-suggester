@@ -1,9 +1,9 @@
 # thisdatedoesnotexist-profile-suggester
- A Flask-based web application that calculates and returns a list of similar user profiles based on their interests, political views, and religion. The server utilizes TF-IDF (Term Frequency-Inverse Document Frequency) vectorization and cosine similarity to determine profile similarities.
+ A simple API that calculates and returns a list of similar user profiles based on their interests, political views, and religion. The server utilizes TF-IDF (Term Frequency-Inverse Document Frequency) vectorization and cosine similarity to determine profile similarities.
 
 ### Setup
 
-To set up the dating app backend, follow these steps:
+To set up the profile recommendation system (profile suggester, in this case), follow these steps:
 
 1. **Install Dependencies:**
    ```bash
@@ -12,7 +12,7 @@ To set up the dating app backend, follow these steps:
 
 2. **Run the Application:**
    ```bash
-   python script_name.py
+   python app.py
    ```
    The server will start at http://localhost:5002.
 

@@ -22,10 +22,10 @@ def preprocess_description(data):
     Preprocesses the description data by extracting relevant information from the input dictionary.
 
     Args:
-        data (dict): The input dictionary containing the description data.
+        data (dict): The input dictionary containing the user's description data.
 
     Returns:
-        str: The preprocessed description string.
+        str: The preprocessed user's description string.
     """
     return (
         " ".join([hobby["name"] for hobby in data["hobbies"]])

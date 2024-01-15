@@ -17,8 +17,16 @@ political_views_weights = {
     "far right": 0.6,
 }
 
-
 def preprocess_description(data):
+    """
+    Preprocesses the description data by extracting relevant information from the input dictionary.
+
+    Args:
+        data (dict): The input dictionary containing the description data.
+
+    Returns:
+        str: The preprocessed description string.
+    """
     return (
         " ".join([hobby["name"] for hobby in data["hobbies"]])
         + f" {data['political_view']} {data['religion']} {data['relationship_goal']['name']}"
@@ -26,6 +34,15 @@ def preprocess_description(data):
 
 
 def initialize_vectorizer(descriptions):
+    """
+    Initialize the vectorizer and calculate cosine similarities for the given descriptions.
+
+    Args:
+        descriptions (list): List of strings representing the descriptions.
+
+    Returns:
+        None
+    """
     global vectorizer, cosine_similarities
     vectorizer = TfidfVectorizer()
     profile_matrix = vectorizer.fit_transform(descriptions)
@@ -33,6 +50,15 @@ def initialize_vectorizer(descriptions):
 
 
 def calculate_similarity_scores(user_data):
+    """
+    Calculate similarity scores between the user's data and other profiles.
+
+    Parameters:
+    - user_data (dict): A dictionary containing the user's data.
+
+    Returns:
+    - list: A list of tuples containing the index and similarity score for each profile, sorted in descending order of similarity score.
+    """
     if cosine_similarities is None:
         return []
 
@@ -48,6 +74,16 @@ def calculate_similarity_scores(user_data):
 
 
 def build_profile_data(profiles, sorted_profiles):
+    """
+    Builds a list of profile data with additional information.
+
+    Args:
+        profiles (list): A list of profiles.
+        sorted_profiles (list): A list of tuples containing the index and score of each profile.
+
+    Returns:
+        list: A list of dictionaries, each containing the profile ID, profile data, and score.
+    """
     return [
         {
             "id": profiles[i - 1]["id"],
@@ -60,6 +96,16 @@ def build_profile_data(profiles, sorted_profiles):
 
 
 def find_similar_profiles(user_data, profiles):
+    """
+    Finds similar profiles based on user data.
+
+    Args:
+        user_data (str): The user's data.
+        profiles (list): A list of profiles to compare with.
+
+    Returns:
+        list: A list of similar profiles.
+    """
     user_description = preprocess_description(user_data)
     profile_descriptions = [preprocess_description(profile) for profile in profiles]
 
@@ -77,6 +123,16 @@ def find_similar_profiles(user_data, profiles):
 
 @app.route("/find-similar-profiles", methods=["POST"])
 def find_similar_profiles_route():
+    """
+    Route handler for finding similar profiles.
+
+    This function receives a JSON payload containing user data and a list of profiles.
+    It calls the `find_similar_profiles` function to find similar profiles based on the user data.
+    The function returns a JSON response with the suggested profiles.
+
+    Returns:
+        A tuple containing the JSON response, status code, and content type header.
+    """
     try:
         data = request.get_json()
         user_data = data.get("user", {})
